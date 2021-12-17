@@ -38,6 +38,15 @@ getSelection.addEventListener("click", async () => {
         console.log(allKeys);
     }); */
 
+    // Opens a new window with the page testgraph.html 
+    // which is included in the extension:
+    chrome.windows.create({
+        url: chrome.runtime.getURL("testgraph.html"),
+        // type: "popup"
+      });
+
+
+
 });
 
 function getCurrentSel() {
