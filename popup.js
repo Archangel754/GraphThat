@@ -13,9 +13,9 @@ const COLORS = [
 
 // Initialize buttons to get selection
 let graphLineChart = document.getElementById("graphLineChart");
-graphLineChart.style.backgroundColor = "#FB00D7";
+//graphLineChart.style.backgroundColor = "#FB00D7";
 let graphBarChart = document.getElementById("graphBarChart");
-graphBarChart.style.backgroundColor = "#BB00D7";
+//graphBarChart.style.backgroundColor = "#BB00D7";
 
 // When buttons are clicked, get selected text and generate graph:
 graphLineChart.addEventListener("click", async () => {
