@@ -11,19 +11,15 @@ const COLORS = [
     'rgb(0,0,128)', // navy
 ]
 
-// Initialize button with user's preferred color
-let changeColor = document.getElementById("changeColor");
-chrome.storage.sync.get("color", ({ color}) => {
-    changeColor.style.backgroundColor = color;
-});
+// Initialize buttons to get selection
+let graphLineChart = document.getElementById("graphLineChart");
+graphLineChart.style.backgroundColor = "#FB00D7";
+let graphBarChart = document.getElementById("graphBarChart");
+graphBarChart.style.backgroundColor = "#BB00D7";
 
-// Initialize button to get selection
-let getSelection = document.getElementById("getSelection");
-getSelection.style.backgroundColor = "#FB00D7";
-
-// When button is clicked, get selected text
-getSelection.addEventListener("click", async () => {
-    console.log("getSelection button clicked");
+// When buttons are clicked, get selected text and generate graph:
+graphLineChart.addEventListener("click", async () => {
+    console.log("graphLineChart button clicked");
     let [tab] = await chrome.tabs.query({ active: true, currentWindow: true});
     chrome.scripting.executeScript({
         target: { tabId: tab.id },
@@ -42,7 +38,7 @@ getSelection.addEventListener("click", async () => {
             // Displays the stored text in the console log
             // logCurrentStoredSel();
             // Call the function for handling the stored data
-            doAfterStoringSelectedText();
+            doAfterStoringSelectedText('line');
             });
 
     // Anything that needs to run after the selected text is 
@@ -63,7 +59,48 @@ getSelection.addEventListener("click", async () => {
     }); */
 });
 
-function doAfterStoringSelectedText() {
+graphBarChart.addEventListener("click", async () => {
+    console.log("graphBarChart button clicked");
+    let [tab] = await chrome.tabs.query({ active: true, currentWindow: true});
+    chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        function: getAndStoreCurrentSel,
+    },
+    (injectionResults) => {
+        
+        for (const frameResult of injectionResults)
+            var framevalue = frameResult.result;
+            // console.log('Frame Title: ' + framevalue);
+            chrome.storage.sync.set({ "currentSelection" : [framevalue] }, function() {
+                if (chrome.runtime.error) {
+                    console.log("Runtime Error.");
+                };
+            });
+            // Displays the stored text in the console log
+            // logCurrentStoredSel();
+            // Call the function for handling the stored data
+            doAfterStoringSelectedText('bar');
+            });
+
+    // Anything that needs to run after the selected text is 
+    // set to storage should be placed in doAfterStoringSelectedText()
+
+    // view myresults which should be selected text:
+    // This displays an outdated result because it runs before 
+    // the selected text is actually set to the storage.
+
+    /* chrome.storage.sync.get("currentSelection", function(result) {
+        console.log('Selected text currently is ' + result.currentSelection);
+    }); */
+
+    // uncomment to view all keys in storage:
+    /* chrome.storage.sync.get(null, function(items) {
+        var allKeys = Object.keys(items);
+        console.log(allKeys);
+    }); */
+});
+
+function doAfterStoringSelectedText(graphType = 'line') {
     chrome.storage.sync.get("currentSelection", function(result) {
         let currentSel = result.currentSelection
         console.log('Selected text to work on currently is ' + currentSel);
@@ -145,7 +182,7 @@ function doAfterStoringSelectedText() {
         //console.log('rowcheck:'+rowCheck.checked)
 
         // get graph object from parseColumns:
-        var graphDataObj = parseColumns(currentSel, rowCheck.checked, colCheck.checked, 'line');
+        var graphDataObj = parseColumns(currentSel, rowCheck.checked, colCheck.checked, graphType);
         // Open a new window with the graph of the data.
         chrome.storage.sync.set({ "graphData" : [graphDataObj] }, function() {
             if (chrome.runtime.error) {
@@ -179,29 +216,6 @@ function retrieveStoredSel() {
         return result.currentSelection;
     });
 }
-
-
-
-// Old stuff from color changing extension:
-
-// When the button is clicked, inject setPageBackgroundColor into curent page
-changeColor.addEventListener("click", async () => {
-    let [tab] = await chrome.tabs.query({ active: true, currentWindow: true});
-    console.log('test bg color button popup console onclick');
-    chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        function: setPageBackgroundColor,
-    });
-});
-
-// The body of this function will be executed as a content script
-// inside the current page
-function setPageBackgroundColor() {
-    chrome.storage.sync.get("color", ({ color }) => {
-        document.body.style.backgroundColor = color;
-    });
-}
-
 
 function parseColumns(inputString = '', firstRowNames = false, firstColIsLabels = false, chartType = 'line') {
     let rows = inputString.trim();
@@ -407,3 +421,34 @@ function combineArrayPair(array, indices, separator) {
 // let a = [0,1,2,'t','d',4,'f','g',7,'t'];
 // let i = getFirstAdjacentTextIndices(a);
 // console.log(i);
+
+// Old stuff from color changing extension: _____________________
+
+// Initialize button with user's preferred color
+let changeColor = document.getElementById("changeColor");
+chrome.storage.sync.get("color", ({ color}) => {
+    changeColor.style.backgroundColor = color;
+});
+
+// When the button is clicked, inject setPageBackgroundColor into curent page
+changeColor.addEventListener("click", async () => {
+    let [tab] = await chrome.tabs.query({ active: true, currentWindow: true});
+    console.log('test bg color button popup console onclick');
+    chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        function: setPageBackgroundColor,
+    });
+});
+
+// The body of this function will be executed as a content script
+// inside the current page
+function setPageBackgroundColor() {
+    chrome.storage.sync.get("color", ({ color }) => {
+        document.body.style.backgroundColor = color;
+    });
+}
+
+// End old stuff _________________________________
+
+
+
