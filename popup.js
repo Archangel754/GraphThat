@@ -59,6 +59,47 @@ graphLineChart.addEventListener("click", async () => {
     }); */
 });
 
+graphScatterChart.addEventListener("click", async () => {
+    console.log("graphBarChart button clicked");
+    let [tab] = await chrome.tabs.query({ active: true, currentWindow: true});
+    chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        function: getAndStoreCurrentSel,
+    },
+    (injectionResults) => {
+        
+        for (const frameResult of injectionResults)
+            var framevalue = frameResult.result;
+            // console.log('Frame Title: ' + framevalue);
+            chrome.storage.sync.set({ "currentSelection" : [framevalue] }, function() {
+                if (chrome.runtime.error) {
+                    console.log("Runtime Error.");
+                };
+            });
+            // Displays the stored text in the console log
+            // logCurrentStoredSel();
+            // Call the function for handling the stored data
+            doAfterStoringSelectedText('scatter');
+            });
+
+    // Anything that needs to run after the selected text is 
+    // set to storage should be placed in doAfterStoringSelectedText()
+
+    // view myresults which should be selected text:
+    // This displays an outdated result because it runs before 
+    // the selected text is actually set to the storage.
+
+    /* chrome.storage.sync.get("currentSelection", function(result) {
+        console.log('Selected text currently is ' + result.currentSelection);
+    }); */
+
+    // uncomment to view all keys in storage:
+    /* chrome.storage.sync.get(null, function(items) {
+        var allKeys = Object.keys(items);
+        console.log(allKeys);
+    }); */
+});
+
 graphBarChart.addEventListener("click", async () => {
     console.log("graphBarChart button clicked");
     let [tab] = await chrome.tabs.query({ active: true, currentWindow: true});
@@ -113,14 +154,14 @@ function doAfterStoringSelectedText(graphType = 'line') {
         // Write the objects required by graph.js to
         // compose the graph. For now hardcoded.
         
-        var glabels = [
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-        ];
+        // var glabels = [
+        //     'January',
+        //     'February',
+        //     'March',
+        //     'April',
+        //     'May',
+        //     'June',
+        // ];
 
         /* var gdata = { // original
             labels: glabels,
@@ -131,45 +172,45 @@ function doAfterStoringSelectedText(graphType = 'line') {
                 data: [0, 10, 5, 2, 20, 30, 45],
             }]
         }; */
-        var gdata = { // for testing
-            labels: glabels,
-            datasets: [{
-                label: 'My First dataset',
-                backgroundColor: 'rgb(255, 99, 132)',
-                borderColor: 'rgb(255, 99, 132)',
-                data: [0, 10, 5, 2, 20, 30],
-            },
-            {
-                label: 'My second dataset',
-                backgroundColor: COLORS[1%NUM_COLORS], //'rgb(255, 99, 132)',
-                borderColor: COLORS[1%NUM_COLORS], //'rgb(255, 99, 132)',
-                data: [10, 15, 52, 2, 20, 30],
-            }]
-        };
+        // var gdata = { // for testing
+        //     labels: glabels,
+        //     datasets: [{
+        //         label: 'My First dataset',
+        //         backgroundColor: 'rgb(255, 99, 132)',
+        //         borderColor: 'rgb(255, 99, 132)',
+        //         data: [0, 10, 5, 2, 20, 30],
+        //     },
+        //     {
+        //         label: 'My second dataset',
+        //         backgroundColor: COLORS[1%NUM_COLORS], //'rgb(255, 99, 132)',
+        //         borderColor: COLORS[1%NUM_COLORS], //'rgb(255, 99, 132)',
+        //         data: [10, 15, 52, 2, 20, 30],
+        //     }]
+        // };
 
             
-        var gconfig = {
-            type: 'line',
-            data: gdata,
-            options: {}
-        };
+        // var gconfig = {
+        //     type: 'line',
+        //     data: gdata,
+        //     options: {}
+        // };
         
-        var graphDataObj = {
-            labels: glabels,
-            data: gdata,
-            config: gconfig
-        };
+        // var graphDataObj = {
+        //     labels: glabels,
+        //     data: gdata,
+        //     config: gconfig
+        // };
 
 
         // for testing:
-        const CA_POPULATION = "Census	Pop.		growth \n" +
-"1850	92,597		—\n"+
-"1860	379,994		310.4%\n"+
-"1870	560,247		47.4%\n"+
-"1880	864,694		54.3%\n"+
-"1890	1,213,398		40.3%\n"+
-"1900	1,485,053		22.4%\n"+
-"1910	2,377,549		60.1%\n";
+//         const CA_POPULATION = "Census	Pop.		growth \n" +
+// "1850	92,597		—\n"+
+// "1860	379,994		310.4%\n"+
+// "1870	560,247		47.4%\n"+
+// "1880	864,694		54.3%\n"+
+// "1890	1,213,398		40.3%\n"+
+// "1900	1,485,053		22.4%\n"+
+// "1910	2,377,549		60.1%\n";
         //var graphDataObj = parseColumns(CA_POPULATION, firstColIsLabels=true, firstRowNames=true);
         
         // needed to convert the selection to a string from type: object
@@ -192,7 +233,7 @@ function doAfterStoringSelectedText(graphType = 'line') {
         // Opens a new window with the page testgraph.html 
         // which is included in the extension:
         chrome.windows.create({
-            url: chrome.runtime.getURL("testgraph.html"),
+            url: chrome.runtime.getURL("graph.html"),
             // type: "popup"
         });
     });
@@ -316,7 +357,7 @@ function parseColumns(inputString = '', firstRowNames = false, firstColIsLabels 
             datasetobj.label = String(rows[0][dataSetIdx+startColumn]);
             //console.log('label'+idataSetIdx + datasetobj.label);
         } else {
-            datasetobj.label = dataSetIdx
+            datasetobj.label = 'Dataset ' + String(dataSetIdx+1)
         }
         datasetobj.backgroundColor = COLORS[dataSetIdx % NUM_COLORS];
         datasetobj.borderColor = COLORS[dataSetIdx % NUM_COLORS];
@@ -425,6 +466,7 @@ function combineArrayPair(array, indices, separator) {
 // Old stuff from color changing extension: _____________________
 
 // Initialize button with user's preferred color
+
 let changeColor = document.getElementById("changeColor");
 chrome.storage.sync.get("color", ({ color}) => {
     changeColor.style.backgroundColor = color;
@@ -449,6 +491,5 @@ function setPageBackgroundColor() {
 }
 
 // End old stuff _________________________________
-
 
 

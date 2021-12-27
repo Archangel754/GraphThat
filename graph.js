@@ -53,3 +53,4 @@ chrome.storage.sync.get("graphData", function(result) {
         config
         );
 });
+
