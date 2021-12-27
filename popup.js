@@ -138,10 +138,17 @@ function doAfterStoringSelectedText() {
         
         // needed to convert the selection to a string from type: object
         currentSel = currentSel.toString();
+
+        // Check the options from the checkboxes in popups:
+        let colCheck = document.getElementById("checkfirstcolumnlabels");
+        let rowCheck = document.getElementById("checkfirstrownames");
+        console.log('colcheck:'+colCheck.checked)
+        console.log('rowcheck:'+rowCheck.checked)
+
         // get graph object from parseColumns:
         // this call valid when first column is labels
         // and first row is names of the datasets.
-        var graphDataObj = parseColumns(currentSel, firstColIsLabels=true, firstRowNames=true);
+        var graphDataObj = parseColumns(currentSel, rowCheck.checked, colCheck.checked);
         // Open a new window with the graph of the data.
         chrome.storage.sync.set({ "graphData" : [graphDataObj] }, function() {
             if (chrome.runtime.error) {
@@ -231,7 +238,7 @@ function parseColumns(inputString, firstRowNames = false, firstColIsLabels = fal
         const xAxisTitle = rows[0][0];
         var startRow = 1;
         var startColumn = 1;
-    } else if (firstRowNames && ! firstColIsLabels){
+    } else if (firstRowNames &&  (!firstColIsLabels)){
         var startRow = 1;
         var startColumn = 0;
         const xAxisTitle = null;
@@ -269,11 +276,11 @@ function parseColumns(inputString, firstRowNames = false, firstColIsLabels = fal
     for (let step = 0; step < numberOfDatasets; step++) {
         dataSetsArray.push([]);
     }
-    // push dataset values to datasetsarray
+    // push dataset values to datasetsarray[[],[]]
     rows.forEach(function(row, rowidx) {
         row.forEach(function(value, columnidx) {
             // console.log('row:',rowidx,'col:',columnidx,'val:',value);
-            if (rowidx >= startRow && columnidx >= startColumn) {
+            if ((rowidx >= startRow) && (columnidx >= startColumn)) {
                 let dataSetIdx = columnidx - startColumn;
                 dataSetsArray[dataSetIdx].push(value)
             }
@@ -286,7 +293,7 @@ function parseColumns(inputString, firstRowNames = false, firstColIsLabels = fal
     let dataSetsObjList = []
     dataSetsArray.forEach(function(dataSet, dataSetIdx) {
         let datasetobj = {}
-        if (firstColIsLabels) {
+        if (firstRowNames) {
             datasetobj.label = rows[0][dataSetIdx+startColumn];
         } else {
             datasetobj.label = dataSetIdx
