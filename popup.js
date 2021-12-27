@@ -56,7 +56,6 @@ getSelection.addEventListener("click", async () => {
         console.log('Selected text currently is ' + result.currentSelection);
     }); */
 
-
     // uncomment to view all keys in storage:
     /* chrome.storage.sync.get(null, function(items) {
         var allKeys = Object.keys(items);
@@ -142,19 +141,16 @@ function doAfterStoringSelectedText() {
         // Check the options from the checkboxes in popups:
         let colCheck = document.getElementById("checkfirstcolumnlabels");
         let rowCheck = document.getElementById("checkfirstrownames");
-        console.log('colcheck:'+colCheck.checked)
-        console.log('rowcheck:'+rowCheck.checked)
+        //console.log('colcheck:'+colCheck.checked)
+        //console.log('rowcheck:'+rowCheck.checked)
 
         // get graph object from parseColumns:
-        // this call valid when first column is labels
-        // and first row is names of the datasets.
-        var graphDataObj = parseColumns(currentSel, rowCheck.checked, colCheck.checked);
+        var graphDataObj = parseColumns(currentSel, rowCheck.checked, colCheck.checked, 'line');
         // Open a new window with the graph of the data.
         chrome.storage.sync.set({ "graphData" : [graphDataObj] }, function() {
             if (chrome.runtime.error) {
                 console.log("Runtime Error.");
-            };
-            
+            };       
         });
         // Opens a new window with the page testgraph.html 
         // which is included in the extension:
@@ -207,7 +203,7 @@ function setPageBackgroundColor() {
 }
 
 
-function parseColumns(inputString, firstRowNames = false, firstColIsLabels = false) {
+function parseColumns(inputString = '', firstRowNames = false, firstColIsLabels = false, chartType = 'line') {
     let rows = inputString.trim();
     //console.log(rows);
     rows = rows.split('\n');
@@ -251,6 +247,20 @@ function parseColumns(inputString, firstRowNames = false, firstColIsLabels = fal
         var startRow = 0;
         var startColumn = 0;
     }
+
+    // find number of datasets
+    let rowLengths = rows.map(row => {
+        return row.length
+    });
+    numberOfDatasets = Math.min(...rowLengths)-startColumn;
+
+    // compress rows so that number of columns is consistent:
+    // while too many columns, combine adjacent text entries.
+    compressRows(rows, numberOfDatasets+startColumn);
+    // rows.forEach(row => {
+    //     console.log(row)
+    // })
+
     // generate labels:
     const numberOfPoints = rows.length-startRow;
     var dataLabels = new Array(numberOfPoints);
@@ -264,12 +274,7 @@ function parseColumns(inputString, firstRowNames = false, firstColIsLabels = fal
         }
     });
 
-    // find number of datasets
-    let rowLengths = rows.map(row => {
-        return row.length
-    });
-    numberOfDatasets = Math.min(...rowLengths)-startColumn;
-
+    
     // collect datasets:
     
     let dataSetsArray = [];
@@ -294,7 +299,8 @@ function parseColumns(inputString, firstRowNames = false, firstColIsLabels = fal
     dataSetsArray.forEach(function(dataSet, dataSetIdx) {
         let datasetobj = {}
         if (firstRowNames) {
-            datasetobj.label = rows[0][dataSetIdx+startColumn];
+            datasetobj.label = String(rows[0][dataSetIdx+startColumn]);
+            //console.log('label'+idataSetIdx + datasetobj.label);
         } else {
             datasetobj.label = dataSetIdx
         }
@@ -310,7 +316,9 @@ function parseColumns(inputString, firstRowNames = false, firstColIsLabels = fal
         datasets: dataSetsObjList,
     };
     let config = {
-        type: 'line',
+        type: chartType,
+        // can add option here for bar chart instead:
+        // type: 'bar',
         data: data,
         options: {}
     };
@@ -336,3 +344,66 @@ function parseColumns(inputString, firstRowNames = false, firstColIsLabels = fal
     */
 
 }
+
+function compressRows(rows, desiredWidth) {
+    rows.forEach(function(row) {
+        while (row.length > desiredWidth) {
+            // text indices: e.g. [0,1]
+            let textIndices = getFirstAdjacentTextIndices(row);
+            // If two strings available, then
+            // combine the entries at the two string indices.
+            // otherwise just combine the first two entries.
+            if (textIndices.length == 2) {
+                combineArrayPair(row,textIndices, ' ');
+            } else {
+                combineArrayPair(row, [0,1],' ')
+            }
+        }
+    });
+}
+// Testing compressRows:
+// r = [[1,2,3],[1,2,'r','t'],[1,'2','r','g',3],[1,2,3,4]];
+// compressRows(r,3)
+// r.forEach(function(row) {
+//     console.log(row)
+// });
+
+function getFirstAdjacentTextIndices(row) {
+    let indices = [];
+    row.forEach(function(element, idx) {
+        isString = ((typeof element) == "string");
+        if (isString) {
+            indices.push(idx)
+        };
+    });
+    let validPairs = [];
+    indices.forEach(function(element, idx) {
+        if (idx < indices.length && (indices[idx+1] - element == 1)) {
+            validPairs.push(indices.slice(idx,idx+2));
+        }
+    })
+    if (validPairs.length > 0) {return validPairs[0]};
+    return [];
+}
+// Test combineArrayPair:
+// let a = ['a','b','c','d','e'];
+// console.log(a);
+// combineArrayPair(a,[1,3],' ');
+// console.log(a);
+
+function combineArrayPair(array, indices, separator) {
+    // Takes an array of two indices 'indices' and 
+    // combines the strings at the two entries in array,
+    // placing them at the first index, and deleting the
+    // item at the second index. Items separated by 'separator'
+    // a = ['2','t','y','u']
+    // combineArrayPair(a,[1,2],' ') -> a = ['2','t y','u']
+    let first = indices[0];
+    let second = indices[1];
+    array[first] = String(array[first]) + separator + String(array[second]);
+    array.splice(second,1);
+}
+// Testing getFirstAdjacentTextIndices:
+// let a = [0,1,2,'t','d',4,'f','g',7,'t'];
+// let i = getFirstAdjacentTextIndices(a);
+// console.log(i);
