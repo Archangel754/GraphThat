@@ -219,18 +219,17 @@ function doAfterStoringSelectedText(graphType = 'line') {
         // Check the options from the checkboxes in popups:
         let colCheck = document.getElementById("checkfirstcolumnlabels");
         let rowCheck = document.getElementById("checkfirstrownames");
-        //console.log('colcheck:'+colCheck.checked)
-        //console.log('rowcheck:'+rowCheck.checked)
+        let dataInRowsCheck = document.getElementById("checkdatainrows");
 
         // get graph object from parseColumns:
-        var graphDataObj = parseColumns(currentSel, rowCheck.checked, colCheck.checked, graphType);
+        var graphDataObj = parseColumns(currentSel, rowCheck.checked, colCheck.checked, dataInRowsCheck.checked, graphType);
         // Open a new window with the graph of the data.
         chrome.storage.sync.set({ "graphData" : [graphDataObj] }, function() {
             if (chrome.runtime.error) {
                 console.log("Runtime Error.");
             };       
         });
-        // Opens a new window with the page testgraph.html 
+        // Opens a new window with the page graph.html 
         // which is included in the extension:
         chrome.windows.create({
             url: chrome.runtime.getURL("graph.html"),
@@ -258,7 +257,7 @@ function retrieveStoredSel() {
     });
 }
 
-function parseColumns(inputString = '', firstRowNames = false, firstColIsLabels = false, chartType = 'line') {
+function parseColumns(inputString = '', firstRowNames = false, firstColIsLabels = false, switchToRows = false, chartType = 'line') {
     let rows = inputString.trim();
     //console.log(rows);
     rows = rows.split('\n');
@@ -277,6 +276,11 @@ function parseColumns(inputString = '', firstRowNames = false, firstColIsLabels 
         });
         return newrow
     });
+
+    // If data in rows instead of columns, transpose the rows matrix
+    if (switchToRows) {
+        rows = transpose(rows)
+    }
     /*
     rows.forEach(element => {
         console.log(element)
@@ -346,8 +350,6 @@ function parseColumns(inputString = '', firstRowNames = false, firstColIsLabels 
             }
         })
     });
-
- 
     
     // add datasets to object]
     let dataSetsObjList = []
@@ -365,6 +367,7 @@ function parseColumns(inputString = '', firstRowNames = false, firstColIsLabels 
         dataSetsObjList.push(datasetobj);
     });
     
+
     // generate data and config structures
     let data = {
         labels: dataLabels,
@@ -463,7 +466,14 @@ function combineArrayPair(array, indices, separator) {
 // let i = getFirstAdjacentTextIndices(a);
 // console.log(i);
 
-// Old stuff from color changing extension: _____________________
+function transpose(inputArray) {
+    // matrix transpose an array of arrays. i.e. swap rows and columns
+    return Object.keys(inputArray[0]).map(function(col) {
+        return inputArray.map(function(row) { return row[col]; });
+    });
+}
+
+/* Old stuff from color changing extension: _____________________
 
 // Initialize button with user's preferred color
 
@@ -490,6 +500,6 @@ function setPageBackgroundColor() {
     });
 }
 
-// End old stuff _________________________________
+// End old stuff _________________________________ */
 
 
