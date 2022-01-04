@@ -64,7 +64,7 @@
         }
         </style>
     </head>
-    <body style="width:150px; height:300px">
+    <body style="width:150px; height:320px">
         <button id="changeColor" hidden=true></button>
         <button id="graphLineChartold" hidden=true></button>
         <button id="graphBarChartold" hidden=true></button>
@@ -73,25 +73,24 @@
         <input type='image' src='images/BarChart_icon30.png' id='graphBarChart'>
         <input type='image' src='images/ScatterChart_icon30.png' id='graphScatterChart'>
 
-        <script src="popup.js"></script>
 
         <h3>Options:</h3>
 
-        <h5>Data in Rows:</h5> 
-
+        <p style="font-weight: bold;">Data in Rows?:</p>
         <label class="switch">
         <input type="checkbox" id="checkdatainrows">
         <span class="slider round"></span>
         </label>
-
-        <h5>First Row Names(columns) or First Col Names(rows):</h5> 
+ 
+        <p style="font-weight: bold;" id="checkFirstRowNamesButtonText">First Row Names:</p>
 
         <label class="switch">
         <input type="checkbox" id="checkfirstrownames">
         <span class="slider round"></span>
         </label>
 
-        <h5>First Column Labels(columns) or First Row Labels(rows):</h5> 
+        <p style="font-weight: bold;" id="checkFirstColumnLabelsButtonText">First Column Labels:</p>
+
 
         <label class="switch">
         <input type="checkbox" id="checkfirstcolumnlabels">
@@ -99,7 +98,8 @@
         </label>
         <br>
         <br>
-        Choose options, then select desired graph type.
+        Choose options, then click desired graph type.
 
+        <script src="popup.js"></script>
     </body>
 </html>
