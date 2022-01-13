@@ -119,12 +119,12 @@ dataInRows.addEventListener('change', function () {
     );
     if (this.checked == true) {
         // data is in rows. set labels appropriately.
-        namesButtonText.innerHTML = 'First Column Names:';
-        labelsButtonText.innerHTML = 'First Row Labels:';
+        namesButtonText.innerHTML = 'First Col Names';
+        labelsButtonText.innerHTML = 'First Row Labels';
     } else {
         // data is in columns
-        namesButtonText.innerHTML = 'First Row Names:';
-        labelsButtonText.innerHTML = 'First Column Labels:';
+        namesButtonText.innerHTML = 'First Row Names';
+        labelsButtonText.innerHTML = 'First Col Labels';
     }
 });
 

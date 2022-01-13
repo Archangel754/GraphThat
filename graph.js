@@ -8,7 +8,6 @@ chrome.storage.sync.get('graphData', function (result) {
     let graphData = result.graphData[0];
     var config = graphData.config;
     myChart = new Chart(document.getElementById('myChart'), config);
-    // addVisibilityButtons()
 });
 
 let addGraphTitleButton = document.getElementById('addGraphTitleButton')
@@ -22,31 +21,13 @@ addGraphTitleButton.addEventListener('click', async () => {
 
 addXAxisTitleButton.addEventListener('click', async () => {
     let userText = document.getElementById('userInputTextBox').value;
-    addAxisTitle(userText,'x');
+        addAxisTitle(userText,'x');
 })
 
 addYAxisTitleButton.addEventListener('click', async () => {
     let userText = document.getElementById('userInputTextBox').value;
     addAxisTitle(userText,'y');
 })
-
-// Add toggle visibility buttons for each dataset
-function addVisibilityButtons() {
-    let numberOfDatasets = myChart.data.datasets.length;
-    //numberOfDatasets = 3
-    for (let index = 0; index < numberOfDatasets; index++) {
-        const datasetID = index;
-        let visButton = document.createElement('button');
-        visButton.innerHTML = datasetID;
-        visButton.id = 'visibilityBotton'+datasetID.toString()
-        document.body.appendChild(visButton); 
-        let buttonElement = document.getElementById('visibilityBotton'+datasetID.toString())
-        buttonElement.addEventListener('click', async () => {
-            myChart.hide(datasetID);
-        })
-
-    }
-}
 
 /**
  * Add userText string as graph title and refreshes graph.
