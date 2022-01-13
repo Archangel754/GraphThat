@@ -1,148 +1,147 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <style>
         .toggle {
-      --width: 40px;
-      --height: calc(var(--width) / 2);
-      position: relative; 
-      left:20px;
-      display: inline-block;
-      margin: 1px;
-      margin-bottom: 3px;
-      vertical-align: middle;
+            --width: 40px;
+            --height: calc(var(--width) / 2);
+            position: relative;
+            left: 20px;
+            display: inline-block;
+            margin: 1px;
+            margin-bottom: 3px;
+            vertical-align: middle;
 
-      width: var(--width);
-      height: var(--height);
-      box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
-      border-radius: var(--height);
-      cursor: pointer;
-    }
+            width: var(--width);
+            height: var(--height);
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+            border-radius: var(--height);
+            cursor: pointer;
+        }
 
-    .toggle input {
-      display: none;
-    }
+        .toggle input {
+            display: none;
+        }
 
-    .toggle .slider {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: var(--height);
-      background-color: #ccc;
-      transition: all 0.4s ease-in-out;
-    }
+        .toggle .slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: var(--height);
+            background-color: #ccc;
+            transition: all 0.4s ease-in-out;
+        }
 
-    .toggle .slider::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: calc(var(--height));
-      height: calc(var(--height));
-      border-radius: calc(var(--height) / 2);
-      background-color: #fff;
-      box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
-      transition: all 0.4s ease-in-out;
-    }
+        .toggle .slider::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: calc(var(--height));
+            height: calc(var(--height));
+            border-radius: calc(var(--height) / 2);
+            background-color: #fff;
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s ease-in-out;
+        }
 
-    .toggle input:checked+.slider {
-      background-color: #2196F3;
-    }
+        .toggle input:checked+.slider {
+            background-color: #2196F3;
+        }
 
-    .toggle input:checked+.slider::before {
-      transform: translateX(calc(var(--width) - var(--height)));
-    }
+        .toggle input:checked+.slider::before {
+            transform: translateX(calc(var(--width) - var(--height)));
+        }
 
+        * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
 
+        body {
+            background-color: #bebebe;
+            display: inline-block;
+            align-items: center;
+            justify-content: center;
+            height: 10vh;
+            font-family: sans-serif;
+        }
 
+        .switch-button {
+            --width: 140px;
+            --radius: 10px;
+            background: rgba(255, 255, 255, 0.56);
+            border-radius: var(--radius);
+            overflow: hidden;
+            width: var(--width);
+            text-align: center;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: #155fff;
+            position: relative;
+            display: inline-block;
+            padding-right: calc(var(--width) / 2);
+        }
 
+        .switch-button:before {
+            content: "Rows";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            width: calc(var(--width) / 2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+            pointer-events: none;
+        }
 
+        .switch-button-checkbox {
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            z-index: 2;
+        }
 
-    * {
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
-  }
-  body {
-    background-color: #bebebe;
-    display: inline-block;
-    align-items: center;
-    justify-content: center;
-    height: 10vh;
-    font-family: sans-serif;
-  }
-  
-  .switch-button {
-    --width: 140px;
-    --radius: 10px;
-    background: rgba(255, 255, 255, 0.56);
-    border-radius: var(--radius);
-    overflow: hidden;
-    width: var(--width);
-    text-align: center;
-    font-size: 12px;
-    letter-spacing: 1px;
-    color: #155fff;
-    position: relative;
-    display: inline-block;
-    padding-right: calc(var(--width) / 2);
-  }
-  .switch-button:before {
-    content: "Rows";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    width: calc(var(--width) / 2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3;
-    pointer-events: none;
-  }
-  .switch-button-checkbox {
-    cursor: pointer;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    z-index: 2;
-  }
-  .switch-button-checkbox:checked + .switch-button-label:before {
-    transform: translateX(calc(var(--width) / 2));
-    transition: transform 300ms linear;
-  }
-  .switch-button-checkbox + .switch-button-label {
-    position: relative;
-    padding: 10px 0;
-    display: block;
-    user-select: none;
-    pointer-events: none;
-  }
-  .switch-button-checkbox + .switch-button-label:before {
-    content: "";
-    background: #fff;
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    left: 0;
-    top: 0;
-    border-radius: var(--radius);
-    transform: translateX(0);
-    transition: transform 300ms;
-  }
-  .switch-button-checkbox + .switch-button-label .switch-button-label-span {
-    position: relative;
-  }
+        .switch-button-checkbox:checked+.switch-button-label:before {
+            transform: translateX(calc(var(--width) / 2));
+            transition: transform 300ms linear;
+        }
 
+        .switch-button-checkbox+.switch-button-label {
+            position: relative;
+            padding: 10px 0;
+            display: block;
+            user-select: none;
+            pointer-events: none;
+        }
 
+        .switch-button-checkbox+.switch-button-label:before {
+            content: "";
+            background: #fff;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            border-radius: var(--radius);
+            transform: translateX(0);
+            transition: transform 300ms;
+        }
 
-
+        .switch-button-checkbox+.switch-button-label .switch-button-label-span {
+            position: relative;
+        }
     </style>
 </head>
 
@@ -155,7 +154,7 @@
 
     <div style="line-height: 30%;">
         <br>
-        </div>
+    </div>
 
     <label class="toggle">
         <input type="checkbox" id="checkfirstrownames">
@@ -163,30 +162,29 @@
     </label>
     <span style="font-weight: bold; margin-left:20px;" id="checkFirstRowNamesButtonText">First Row Names</span>
 
-
     <label class="toggle">
         <input type="checkbox" id="checkfirstcolumnlabels">
         <span class="slider">
         </span>
     </label>
-    <span style="font-weight: bold; margin-left:20px;" id="checkFirstColumnLabelsButtonText">First Col Labels</span> 
+    <span style="font-weight: bold; margin-left:20px;" id="checkFirstColumnLabelsButtonText">First Col Labels</span>
 
     <div style="line-height: 30%;">
         <br>
     </div>
-    
+
     <div style="margin-left: 40px;margin-top: 5px;margin-bottom: 8px;">
-    <input type='image' src='images/LineChart_icon30.png' id='graphLineChart'>
-    <input type='image' src='images/BarChart_icon30.png' id='graphBarChart'>
-    <input type='image' src='images/ScatterChart_icon30.png' id='graphScatterChart'>
+        <input type='image' src='images/LineChart_icon30.png' id='graphLineChart'>
+        <input type='image' src='images/BarChart_icon30.png' id='graphBarChart'>
+        <input type='image' src='images/ScatterChart_icon30.png' id='graphScatterChart'>
     </div>
-    
+
     <h3 style="margin-left: 40px;">Instructions:</h3>
-    <div style="margin-left: 40px;">1. Select text<br>
-    2. Choose options<br>
-    3. Click graph type</div>
-    
-    
+    <div style="margin-left: 40px;">
+        1. Select text<br>
+        2. Choose options<br>
+        3. Click graph type</div>
     <script src="popup.js"></script>
 </body>
+
 </html>
