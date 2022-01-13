@@ -1,6 +1,6 @@
 {
     "name": "GraphIt",
-    "description": "Graph Selected Text",
+    "description": "Quickly graph data by selecting text on a webpage.",
     "version": "0.0.0.1",
     "manifest_version": 3,
     "background": {
