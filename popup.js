@@ -1,5 +1,5 @@
 /* 
-Main logic of the popup is in doAfterStoringSelectedText
+Main logic of the popup is in processStoredText
 and parseColumns. Button clicks are handled by event listeners.
 They use chrome scripting to inject a script into the current tab
 which gets the current text selection. The selection is then parsed
@@ -47,11 +47,11 @@ graphLineChart.addEventListener('click', async () => {
                 }
             );
             // Do the rest of processing and graph data
-            doAfterStoringSelectedText('line');
+            processStoredText('line');
         }
     );
     // Anything that needs to run after the selected text is
-    // set to storage should be placed in doAfterStoringSelectedText()
+    // set to storage should be placed in processStoredText()
 });
 
 graphScatterChart.addEventListener('click', async () => {
@@ -74,11 +74,11 @@ graphScatterChart.addEventListener('click', async () => {
                 }
             );
             // Do the rest of processing and graph data
-            doAfterStoringSelectedText('scatter');
+            processStoredText('scatter');
         }
     );
     // Anything that needs to run after the selected text is
-    // set to storage should be placed in doAfterStoringSelectedText()
+    // set to storage should be placed in processStoredText()
 });
 
 graphBarChart.addEventListener('click', async () => {
@@ -101,11 +101,11 @@ graphBarChart.addEventListener('click', async () => {
                 }
             );
             // Do the rest of processing and graph data
-            doAfterStoringSelectedText('bar');
+            processStoredText('bar');
         }
     );
     // Anything that needs to run after the selected text is
-    // set to storage should be placed in doAfterStoringSelectedText()
+    // set to storage should be placed in processStoredText()
 });
 
 dataInRows.addEventListener('change', function () {
@@ -135,7 +135,7 @@ dataInRows.addEventListener('change', function () {
  * and opens new window with graph of data.
  * @param {*} graphType 'line' or 'bar' or 'scatter'
  */
-function doAfterStoringSelectedText(graphType = 'line') {
+function processStoredText(graphType = 'line') {
     chrome.storage.sync.get('currentSelection', function (result) {
         let currentSel = result.currentSelection;
         // Convert the selection to a string from type: object
